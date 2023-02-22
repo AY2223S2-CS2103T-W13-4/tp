@@ -21,15 +21,15 @@ public class PersonBuilder {
     public static final String DEFAULT_PHONE = "85355255";
     public static final String DEFAULT_EMAIL = "amy@gmail.com";
     public static final String DEFAULT_ADDRESS = "123, Jurong West Ave 6, #08-111";
+
+
     public static final String DEFAULT_REMARK = "She likes aardvarks.";
-
-
     private Name name;
     private Phone phone;
     private Email email;
     private Address address;
-    private Remark remark;
 
+    private Remark remark;
     private Set<Tag> tags;
 
     /**
@@ -97,7 +97,9 @@ public class PersonBuilder {
     }
 
     /**
-     * Sets the {@code Remark} of the {@code Person} that we are building.
+     * Sets the{@Code Remark} of the {@Code Person} that we are building.
+     * @param remark The valid remark
+     * @return A PersonBuilder
      */
     public PersonBuilder withRemark(String remark) {
         this.remark = new Remark(remark);

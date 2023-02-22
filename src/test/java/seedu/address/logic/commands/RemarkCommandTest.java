@@ -1,5 +1,4 @@
 package seedu.address.logic.commands;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_REMARK_AMY;
@@ -27,6 +26,7 @@ import seedu.address.testutil.PersonBuilder;
  * Contains integration tests (interaction with the Model) and unit tests for RemarkCommand.
  */
 public class RemarkCommandTest {
+
     private static final String REMARK_STUB = "Some remark";
 
     private Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
@@ -100,9 +100,9 @@ public class RemarkCommandTest {
         assertTrue(outOfBoundIndex.getZeroBased() < model.getAddressBook().getPersonList().size());
 
         RemarkCommand remarkCommand = new RemarkCommand(outOfBoundIndex, new Remark(VALID_REMARK_BOB));
-
         assertCommandFailure(remarkCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
+
 
     @Test
     public void equals() {
@@ -112,16 +112,12 @@ public class RemarkCommandTest {
         RemarkCommand commandWithSameValues = new RemarkCommand(INDEX_FIRST_PERSON,
             new Remark(VALID_REMARK_AMY));
         assertTrue(standardCommand.equals(commandWithSameValues));
-
         // same object -> returns true
         assertTrue(standardCommand.equals(standardCommand));
-
         // null -> returns false
         assertFalse(standardCommand.equals(null));
-
         // different types -> returns false
         assertFalse(standardCommand.equals(new ClearCommand()));
-
         // different index -> returns false
         assertFalse(standardCommand.equals(new RemarkCommand(INDEX_SECOND_PERSON,
             new Remark(VALID_REMARK_AMY))));
