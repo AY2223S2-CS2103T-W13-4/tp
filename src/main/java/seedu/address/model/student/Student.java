@@ -2,10 +2,13 @@ package seedu.address.model.student;
 
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import seedu.address.model.tag.Tag;
 
@@ -22,7 +25,9 @@ public class Student {
 
     // Data fields
     private final Address address;
+    private final List<Homework> homeworkList = new ArrayList<>();
     private final Set<Tag> tags = new HashSet<>();
+
 
     /**
      * Every field must be present and not null.
@@ -55,14 +60,96 @@ public class Student {
     /**
      * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
      * if modification is attempted.
+     *
+     * @return set of tags
      */
     public Set<Tag> getTags() {
         return Collections.unmodifiableSet(tags);
     }
 
     /**
+     * Returns an immutable assignment list, which throws {@code UnsupportedOperationException}
+     * if modification is attempted.
+     *
+     * @return list of homework
+     */
+    public List<Homework> getHomeworkList() {
+        return Collections.unmodifiableList(homeworkList);
+    }
+
+    /**
+     * Returns an immutable assignment list, which throws {@code UnsupportedOperationException}
+     * if modification is attempted.
+     *
+     * @return list of completed homework
+     */
+    public List<Homework> getCompletedHomeworkList() {
+        List<Homework> completedHomeworkList = new ArrayList<>();
+        for (Homework hw : homeworkList) {
+            if (hw.isCompleted()) {
+                completedHomeworkList.add(hw);
+            }
+        }
+        return Collections.unmodifiableList(completedHomeworkList);
+    }
+
+    /**
+     * Returns an immutable assignment list, which throws {@code UnsupportedOperationException}
+     * if modification is attempted.
+     *
+     * @return list of pending homework
+     */
+    public List<Homework> getPendingHomeworkList() {
+        List<Homework> pendingHomeworkList = new ArrayList<>();
+        for (Homework hw : homeworkList) {
+            if (!hw.isCompleted()) {
+                pendingHomeworkList.add(hw);
+            }
+        }
+        return Collections.unmodifiableList(pendingHomeworkList);
+    }
+
+    /**
+     * Returns an immutable assignment list, which throws {@code UnsupportedOperationException}
+     * if modification is attempted.
+     *
+     * @return list of filtered homework
+     */
+    public List<Homework> getFilteredHomeworkList(Predicate<Homework> predicate) {
+        List<Homework> filteredHomeworkList = new ArrayList<>();
+
+        // filter homework list
+        for (Homework hw : homeworkList) {
+            if (predicate.test(hw)) {
+                filteredHomeworkList.add(hw);
+            }
+        }
+
+        return Collections.unmodifiableList(filteredHomeworkList);
+    }
+
+    /**
+     * Adds a homework to the homework list.
+     *
+     * @param homework homework to be added
+     */
+    public void addHomework(Homework homework) {
+        // check for duplicate homework
+        for (Homework hw : this.homeworkList) {
+            if (hw.equals(homework)) {
+                return;
+            }
+        }
+
+        this.homeworkList.add(homework);
+    }
+
+    /**
      * Returns true if both persons have the same name.
      * This defines a weaker notion of equality between two persons.
+     *
+     * @param otherPerson other person to compare to
+     * @return boolean
      */
     public boolean isSamePerson(Student otherPerson) {
         if (otherPerson == this) {
@@ -92,13 +179,14 @@ public class Student {
                 && otherPerson.getPhone().equals(getPhone())
                 && otherPerson.getEmail().equals(getEmail())
                 && otherPerson.getAddress().equals(getAddress())
-                && otherPerson.getTags().equals(getTags());
+                && otherPerson.getTags().equals(getTags())
+                && otherPerson.getHomeworkList().equals(getHomeworkList());
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags);
+        return Objects.hash(name, phone, email, address, tags, homeworkList);
     }
 
     @Override
@@ -110,7 +198,9 @@ public class Student {
                 .append("; Email: ")
                 .append(getEmail())
                 .append("; Address: ")
-                .append(getAddress());
+                .append(getAddress())
+                .append("; Assignments: ")
+                .append(getHomeworkList());
 
         Set<Tag> tags = getTags();
         if (!tags.isEmpty()) {
