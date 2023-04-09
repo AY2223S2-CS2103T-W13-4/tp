@@ -208,6 +208,7 @@ It has a name, a start time, an end time, and a status, an optional weightage, a
   e.g. `[name/STUDENT_NAME]…​` can be used as ` ` (i.e. 0 times), `name/John Doe`, `name/John Doe name/Jane Doe` (2 times) etc.
 * Extra parameters for commands that don't take in parameters (such as `help`, `exit,` and `clear`) will be ignored.<br>
   e.g. if the command specifies `help 123`, it will be interpreted as `help`.
+* Empty parameters will cause an error. For example, `new-student name/ address/Block 414`.
 * Unless otherwise specified, the order of prefixes doesn't matter.<br>
   e.g. if the command specifies `name/NAME phone/PHONE_NUMBER`, `phone/PHONE_NUMBER name/NAME` is also acceptable unless stated otherwise in a particular command.
 * TutorPro allows you to execute commands on students in the entire student list, instead of just the displayed list. 
@@ -297,7 +298,7 @@ Examples:
 ### Homework Commands
 #### Assign Homework to a Student
 
-Create a homework assignment with a deadline for multiple students.
+Create a homework assignment with a deadline for one or more students.
 
 Format: `new-homework [name/STUDENT_NAME]... [homework/HOMEWORK_NAME] [deadline/DEADLINE]`
 
@@ -325,7 +326,7 @@ For example, `john` will match `John Doe` and `john doe`. You can refer to the [
 :exclamation: **Caution:** HOMEWORK_INDEX
 and DEADLINE should all only appear exactly once and should not be empty.
 
-:bulb: **Tip:** A student can have multiple homeworks with the same name,
+:bulb: **Tip:** A student cannot have multiple homeworks with the same name,
 even if they have different deadlines.
 
 #### View Student Homework
@@ -337,8 +338,8 @@ Format: `view-homework [name/STUDENT_NAME]... [status/STATUS]`
 * By default, all homework will be displayed if no name or status parameter is provided.
 * To view homework for specific students, specify the name using `name/STUDENT_NAME` prefixes.
 * To view homework with a specific status, specify the status using `status/STATUS`.
-* It is possible to filter by both student name and status simultaneously.
 * The available status values are `completed` and `pending`.
+* It is possible to filter by both student name and status simultaneously.
 
 Examples:
 * `view-homework` displays a list of all homework.
@@ -351,8 +352,8 @@ Examples:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STATUS should only appear at most once and should not be empty.
-STUDENT_NAME can be zero or multiple, but they all can't be empty.
+:exclamation: **Caution:** STATUS should only appear at most once.
+STUDENT_NAME can appear zero or multiple times.
 
 #### Delete Homework from a Student
 
@@ -366,17 +367,16 @@ Format: `delete-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`
 
 Examples:
 
-* `delete-homework name/John index/1` deletes the first homework assignment for the student named John.
-* `delete-homework name/Susan index/3` deletes the third homework assignment for the student named Susan.
+* `delete-homework name/John index/1` deletes the first homework for the student named John.
+* `delete-homework name/Susan index/3` deletes the third homework for the student named Susan.
 
 ![Delete Homework](images/delete-homework.jpg)
 
-:bulb: **Tip:** You can use the `view-homework` command to view the list of homework the student currently has.
 
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear exactly once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear exactly once.
 
 #### Mark the Homework of a Student as Done
 
@@ -384,7 +384,7 @@ Marks homework of a student as done.
 
 Format: `mark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`
 
-* The `STUDENT_NAME` must be an existing student of the tutor. Note that there can only be one student's name.
+* The `STUDENT_NAME` must be an existing student of the tutor.
 * The `HOMEWORK_INDEX` must be the index of an existing homework assignment for the specified student.
 * A success message will be displayed if the homework assignment is successfully deleted. Otherwise, an error message will be displayed.
 
@@ -398,7 +398,7 @@ Examples:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear exactly once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear exactly once.
 
 #### Unmark Homework of a Student as Undone
 
@@ -406,7 +406,7 @@ Marks homework of a student as undone.
 
 Format: `unmark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`
 
-* The `STUDENT_NAME` must be an existing student of the tutor. Note that there can only be one student's name.
+* The `STUDENT_NAME` must be an existing student of the tutor.
 * The `HOMEWORK_INDEX` must be the index of an existing homework assignment for the specified student.
 * A success message will be displayed if the homework assignment is successfully deleted. Otherwise, an error message will be displayed.
 
@@ -420,7 +420,7 @@ Examples:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear at most once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME, and HOMEWORK_INDEX should all only appear exactly once.
 
 #### Update Homework of a Student
 
@@ -432,14 +432,15 @@ Format: `update-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX] [homework/HO
 * The `HOMEWORK_INDEX` must be the index of an existing homework assignment for the specified student.
 * The `DEADLINE` must be in the format given in the support date and time formats' appendix.
 * The `DEADLINE` must be in the future.
-* At least one of homework names and deadline must be in the command. They can't be absent concurrently.
+* `HOMEWORK_NAME` and `DEADLINE` are the updated values for this homework.
+* At least one of homework names and deadline must be in the command. They can't both be absent.
 * A success message will be displayed if the homework assignment is successfully deleted. Otherwise, an error message will be displayed.
 
 Examples:
 
 * `update-homework name/John index/1 homework/Math Assignment 1` updates the name of homework 1 of John to be `Math Assignment 1`.
-* `updates-homework name/Susan index/3 deadline/2023-05-12 23:59` updates the deadline of homework 3 of Susan to be `2023-05-12 23:59`.
-* `updates-homework name/Donald index/2 homework/Math Assignment 1 deadline/2023-05-12 23:59` updates the name of homework 2 of Donald to be `Math Assignment 1` and updates the deadline of homework 2 of Donald to be `2023-05-12 23:59`.
+* `update-homework name/Susan index/3 deadline/2023-05-12 23:59` updates the deadline of homework 3 of Susan to be `2023-05-12 23:59`.
+* `update-homework name/Donald index/2 homework/Math Assignment 1 deadline/2023-05-12 23:59` updates the name of homework 2 of Donald to be `Math Assignment 1` and updates the deadline of homework 2 of Donald to be `2023-05-12 23:59`.
 
 ![Update Homework](images/update-homework.jpg)
 
@@ -451,29 +452,28 @@ Examples:
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
 :exclamation:  **Caution:** STUDENT_NAME, HOMEWORK_INDEX,
-and DEADLINE should all only appear at most once and should not be empty.
+and DEADLINE should all only appear at most once.
 
-:exclamation: **Caution:** A student can have multiple homework with the same name,
+:bulb: **Tip:** A student cannot have multiple homework with the same name,
 even if they have different deadlines.
 
 ### Lessons Commands
 
-#### Create a New Lesson Plan for the Upcoming Lesson
+#### Create a New Lesson Plan for an Upcoming Lesson
 
 Creates a new lesson for a given student, with a lesson title and time.
 
 Format: `new-lesson [name/STUDENT_NAME]... [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`
 
 * The `STUDENT_NAME` must be an existing student of the tutor.
-* The `START_TIME` and `END_TIME` must be in the format given in the support date and time formats' appendix.
+* You can enter multiple `name/` prefixes to create the same lesson for multiple students.
 * `START_TIME` must be before `END_TIME`, and their difference must be at least 30 minutes and at most 3 hours.
 * `START_TIME` and `END_TIME` must be in the future.
 * A success message will be displayed if the lesson is successfully created. Otherwise, an error message will be displayed.
 
 Examples:
-* `new-lesson name/John Doe lesson/The Water Cycle start/2025-03-23 1300 end/2025-03-23 1500` creates a new lesson for the student named `John Doe` with the lesson title `The Water Cycle` starting at `2025 Mar 2023 13:00` and ending at `2025 Mar 2023 15:00`.
-* `new-lesson name/Bernice Yu lesson/Photosynthesis start/2025-03-23 1300 end/2025-03-23 1500` creates a new lesson for the student named `Bernice Yu` with the lesson title `Photosynthesis` starting at `2025 Mar 2023 13:00` and ending at `2025 Mar 2023 15:00`.
-* `new-lesson name/David Li lesson/Metamorphic Rocks start/2025-03-23 1300 end/2025-03-23 1500` creates a new lesson for the student named `David Li` with the lesson title `Metamorphic Rocks` starting at `2025 Mar 2023 13:00` and ending at `2025 Mar 2023 15:00`.
+* `new-lesson name/John Doe lesson/The Water Cycle start/2025-03-23 1300 end/2025-03-23 1500` creates a new lesson for the student named `John Doe` with the lesson title `The Water Cycle` starting at `23 Mar 2025 13:00` and ending at `23 Mar 2025 15:00`.
+* `new-lesson name/David Li name/John Doe lesson/Metamorphic Rocks start/2025-04-23 1300 end/2025-04-23 1500` creates a new lesson for the students named `David Li` and `John Doe`  with the lesson title `Metamorphic Rocks` starting at `23 Apr 2025 13:00` and ending at `23 Apr 2025 15:00`.
 
 ![New Lesson](images/new-lesson.jpg)
 
@@ -484,41 +484,43 @@ Examples:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME should appear at least once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME should appear at least once.
 
-:exclamation: **Caution:** LESSON_TITLE, START_TIME, and END_TIME should all appear exactly once and should not be empty.
+:exclamation: **Caution:** LESSON_TITLE, START_TIME, and END_TIME should all appear exactly once.
 
-:exclamation: **Caution:** A student can have multiple lessons with the same lesson title, even if they have different start and end times.
+:exclamation: **Caution:** A student can have multiple lessons with the same lesson title, but only if their lesson times do not clash with each other. See
+[Duplicate Lesson Detection](#duplicate-lesson-detection-mechanism) for more details.
 
 #### View Lessons
 
 Displays the lessons for a given student/all students.
 
-Format: `view-lesson (optional)[name/STUDENT_NAME] (optional)[subject/SUBJECT] (optional)[date/DATE] (optional)[done/DONE]`
+Format: `view-lesson [name/STUDENT_NAME] [subject/SUBJECT] [date/DATE] [done/DONE]`
 
-* By default, the lessons for all the tutor’s students will be displayed if no parameters are specified.
-* To view the lessons for specific students, specify the names using `name/STUDENT_NAME`s.
+* If no parameters are given, the lessons for all students will be displayed.
+* Every parameter is optional.
+* To view the lessons for specific student(s), specify the names using `name/STUDENT_NAME` prefix(es).
 * To view the lessons for a specific subject, specify the subject using `subject/SUBJECT`.
 * To view the lessons for a specific date, specify the date using `date/DATE`.
-* To view the lessons that'd been completed, include `done/done`.
+* To view the lessons that have been completed, include `done/done`.
 * To view the lessons that haven't been completed, include `done/not done`.
 
 Examples:
 * `view-lesson` Displays the lesson history for all the tutor’s students.
 * `view-lesson name/John` Displays the lesson history for the student named John.
-* `view-lesson name/John subject/Math date/2023-05-03` Displays the lessons for student John, which are of subject Math, on the day 2023-05-03.
-* `view-lesson done/done` Displays all lessons that'd been completed
-* `view-lesson done/not done` Displays all lessons that haven't been completed
-* `view-lesson name/John done/done` Displays all lessons that'd been completed for student John
-* `view-lesson name/John name/Bernice done/not done` Displays all lessons that haven't been completed for students John and Bernice
+* `view-lesson name/John subject/Math date/2023-05-03` Displays the lessons for student John, for the subject Math, on the day 2023-05-03.
+* `view-lesson done/done` Displays all lessons that have been completed.
+* `view-lesson done/not done` Displays all lessons that have not been completed.
+* `view-lesson name/John done/done` Displays all lessons that have been completed for student John.
+* `view-lesson name/John name/Bernice done/not done` Displays all lessons for students John and Bernice that have not been completed.
 
 ![View Lesson](images/view-lesson.jpg)
 
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** SUBJECT, DATE, and DONE should all only appear at most once and should not be empty.
-STUDENT_NAME can appear multiple times, but none should empty.
+:exclamation: **Caution:** SUBJECT, DATE, and DONE can appear at most once.
+STUDENT_NAME can appear multiple times.
 
 #### Delete a Lesson from a student
 Deletes a lesson for a given student.
@@ -540,28 +542,27 @@ Example:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME and LESSON_INDEX should all appear exactly once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME and LESSON_INDEX should appear exactly once.
 
 
 #### Update a Lesson
-Updates a lesson for a given student. This includes the lesson title, start time, and/or end time.
+Updates a lesson for a given student. This can change the lesson title, start time, and/or end time.
 
-Format: `update-lesson [name/STUDENT_NAME] [index/LESSON_INDEX] (optional)[lesson/LESSON_TITLE] (optional)[start/START_TIME] (optional)[end/END_TIME]`
+Format: `update-lesson [name/STUDENT_NAME] [index/LESSON_INDEX] [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`
 
 * The `STUDENT_NAME` must be an existing student of the tutor. Note that there can only be one student's name.
 * The `LESSON_INDEX` must be a positive integer that is within the range of the student's lesson list.
-* At least one of the optional parameters must be provided.
-* The `START_TIME`, and `END_TIME` provided must be in any of the supported date-time formats (see appendix).
+* `LESSON_TITLE`, `START_TIME` and `END_TIME` are the updated values for this lesson. At least one of them should be present.
 * The provided `START_TIME` must be before the provided `END_TIME`, or, if the `END_TIME` is not provided, it must be before the original end time of the lesson.
 * The provided `END_TIME` must be after the provided `START_TIME`, or, if the `START_TIME` is not provided, it must be after the original start time of the lesson.
 * The updated lesson's duration must be at least 30 minutes and at most 3 hours.
 * A success message will be displayed if the lesson is successfully updated. Otherwise, an error message will be displayed.
 
 Example:
-* `update-lesson name/John Doe index/1 lesson/The Water Cycle start/2025-03-23 1300 end/2025-03-23 1500` updates the first lesson for the student named John Doe to have the lesson title "The Water Cycle", start time "2025-03-23 1300", and end time "2025-03-23 1500".
-* `update-lesson name/Bernice Yu index/2 lesson/Photosynthesis` updates the second lesson for the student named Bernice Yu to have the lesson title "Photosynthesis".
-* `update-lesson name/John Doe index/1 start/2025-03-23 1300` updates the first lesson for the student named John Doe to have the start time "2025-03-23 1300".
-* `update-lesson name/Bernice Yu index/2 end/2025-03-23 1500` updates the second lesson for the student named Bernice Yu to have the end time "2025-03-23 1500".
+* `update-lesson name/John Doe index/1 lesson/The Water Cycle start/2025-03-23 1300 end/2025-03-23 1500` updates the first lesson for the student named John Doe to have the lesson title `The Water Cycle`, start time `23 Mar 2025 13:00`, and end time `23 Mar 2025 15:00`.
+* `update-lesson name/Bernice Yu index/2 lesson/Photosynthesis` updates the second lesson for the student named Bernice Yu to have the lesson title `Photosynthesis`.
+* `update-lesson name/John Doe index/1 start/2025-03-23 1300` updates the first lesson for the student named John Doe to have the start time `23 Mar 2025 13:00`.
+* `update-lesson name/Bernice Yu index/2 end/2025-03-23 1500` updates the second lesson for the student named Bernice Yu to have the end time `23 Mar 2025 15:00`.
 
 ![Update Lesson](images/update-lesson.jpg)
 
@@ -572,9 +573,9 @@ Example:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME, LESSON_INDEX should appear exactly once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME, LESSON_INDEX should appear exactly once.
 
-:exclamation: **Caution:** LESSON_TITLE, START_TIME, and END_TIME should appear at most once and should not be empty.
+:exclamation: **Caution:** LESSON_TITLE, START_TIME, and END_TIME should each appear at most once.
 
 ### Exam Commands
 
