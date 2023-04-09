@@ -23,19 +23,20 @@ TutorPro is a **desktop app designed to help private tutors manage their student
 - [Commands](#commands)
   * [How to interpret the Command format](#how-to-interpret-the-command-format)
   * [Profile Commands](#profile-commands)
+    + [List all Students](#list-all-students)
     + [Create a new Student Profile](#create-a-new-student-profile)
     + [View a Student Profile](#view-a-student-profile)
     + [Update Student Information](#update-student-information)
     + [Delete a Student Profile](#delete-a-student-profile)
   * [Homework Commands](#homework-commands)
     + [Assign Homework to a Student](#assign-homework-to-a-student)
-    + [View the Homework of Students](#view-the-homework-of-students)
+    + [View Student Homework](#view-student-homework)
     + [Delete Homework from a Student](#delete-homework-from-a-student)
     + [Mark the Homework of a Student as Done](#mark-the-homework-of-a-student-as-done)
     + [Unmark Homework of a Student as Undone](#unmark-homework-of-a-student-as-undone)
     + [Update Homework of a Student](#update-homework-of-a-student)
   * [Lessons Commands](#lessons-commands)
-    + [Create a New Lesson Plan for the Upcoming Lesson](#create-a-new-lesson-plan-for-the-upcoming-lesson)
+    + [Create a New Lesson Plan for the Upcoming Lesson](#create-a-new-lesson-plan-for-an-upcoming-lesson)
     + [View Lessons](#view-lessons)
     + [Delete a Lesson from a student](#delete-a-lesson-from-a-student)
     + [Update a Lesson](#update-a-lesson)
@@ -44,6 +45,10 @@ TutorPro is a **desktop app designed to help private tutors manage their student
     + [Remove an exam](#remove-an-exam)
     + [View exams tracked by TutorPro](#view-exams-tracked-by-tutorpro)
     + [Edit exam details](#edit-exam-details)
+  * [Global Commands](#global-commands)
+    + [Get Help for TutorPro](#get-help-for-tutorpro)
+    + [Clear all TutorPro Data](#clear-all-tutorpro-data)
+    + [Exit TutorPro](#exit-tutorpro)
 - [Unique Mechanisms](#unique-mechanisms)
   * [Search by Name Mechanism](#search-by-name-mechanism)
   * [Schedule Clash Detection Mechanism](#schedule-clash-detection-mechanism)
@@ -53,10 +58,10 @@ TutorPro is a **desktop app designed to help private tutors manage their student
     + [Schedule Clash Detection Mechanism when Adding a New Exam](#schedule-clash-detection-mechanism-when-adding-a-new-exam)
       - [With respect to existing lessons](#with-respect-to-existing-lessons-1)
       - [With respect to existing exams](#with-respect-to-existing-exams-1)
-  * [Duplicate Detection Mechanism](#duplicate-detection-mechanism)
-    + [Duplicate Homework Detection Mechanism](#duplicate-homework-detection-mechanism)
-    + [Duplicate Lesson Detection Mechanism](#duplicate-lesson-detection-mechanism)
-    + [Duplicate Exam Detection Mechanism](#duplicate-exam-detection-mechanism)
+  * [Duplicate Detection Policy](#duplicate-detection-policy)
+    + [Duplicate Homework Detection](#duplicate-homework-detection)
+    + [Duplicate Lesson Detection](#duplicate-lesson-detection)
+    + [Duplicate Exam Detection](#duplicate-exam-detection)
 - [FAQ](#faq)
 - [Summary](#summary)
   * [List of Commands](#list-of-commands)
@@ -182,7 +187,7 @@ you can use the `view-exams` command to view the list of exams.
 ## Main Entities
 TutorPro allows you to easily handle three main entities of your students: `Homework`, `Lesson`, and `Exam`.
 TutorPro also has unique mechanisms to handle duplicate entities and potential clashes between entities.
-Please refer to the [Duplicate Detection Mechanism](#duplicate-detection-mechanism) and [Schedule Clash Detection Mechanism](#schedule-clash-detection-mechanism) sections for more details.
+Please refer to the [Duplicate Detection Mechanism](#duplicate-detection-policy) and [Schedule Clash Detection Mechanism](#schedule-clash-detection-mechanism) sections for more details.
 
 ### Homework
 A `Homework` is an assignment that you've assigned to a `Student`.
@@ -209,6 +214,7 @@ It has a name, a start time, an end time, and a status, an optional weightage, a
 * Extra parameters for commands that don't take in parameters (such as `help`, `exit,` and `clear`) will be ignored.<br>
   e.g. if the command specifies `help 123`, it will be interpreted as `help`.
 * Empty parameters will cause an error. For example, `new-student name/ address/Block 414`.
+* All `start/` and `end/` parameters must follow the [Supported Date Time Formats](#supported-date-time-formats).
 * Unless otherwise specified, the order of prefixes doesn't matter.<br>
   e.g. if the command specifies `name/NAME phone/PHONE_NUMBER`, `phone/PHONE_NUMBER name/NAME` is also acceptable unless stated otherwise in a particular command.
 * TutorPro allows you to execute commands on students in the entire student list, instead of just the displayed list. 
@@ -228,6 +234,18 @@ It has a name, a start time, an end time, and a status, an optional weightage, a
 :information_source: **Why TutorPro uses search by index for all the Profile Commands instead of the unique search by name mechanism?**<br>
 For profile commands, especially `delete` and `update-info` command, that may potentially change the name of the student, TutorPro uses search by index instead of search by name to avoid any confusion that may be caused by the name change. 
 
+#### List all Students
+
+Lists all students in TutorPro.
+
+Format: `list`
+
+* This list shows the indexes of all Students in TutorPro. Use it to find the correct index to delete/edit a student.
+
+Example:
+* `list` Lists down all students currently stored in TutorPro.
+
+
 #### Create a new Student Profile
 
 Creates a new profile for a student, given the student’s name.
@@ -238,7 +256,7 @@ Format: `new-student [name/STUDENT_NAME] [address/STUDENT_ADDRESS] [phone/PHONE]
 * SCHOOL and GRADE_LEVEL consist of numbers and letters only (no symbols or spaces).
 
 Example:
-* `new-student name/John Doe address/21 Prince George’s Park email/jdoe@gmail.com phone/12345678 school/ACJC level/sec8`
+* `new-student name/John Doe address/21 Prince George’s Park email/jdoe@gmail.com phone/12345678 school/ACJC level/sec8` Adds a new student named `John Doe` to TutorPro. 
 
 ![new-student.png](images/new-student.png)
 
@@ -466,7 +484,6 @@ Creates a new lesson for a given student, with a lesson title and time.
 Format: `new-lesson [name/STUDENT_NAME]... [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`
 
 * The `STUDENT_NAME` must be an existing student of the tutor.
-* You can enter multiple `name/` prefixes to create the same lesson for multiple students.
 * `START_TIME` must be before `END_TIME`, and their difference must be at least 30 minutes and at most 3 hours.
 * `START_TIME` and `END_TIME` must be in the future.
 * A success message will be displayed if the lesson is successfully created. Otherwise, an error message will be displayed.
@@ -484,7 +501,7 @@ Examples:
 :exclamation: **Caution:** STUDENT_NAME is case-insensitive and supports partial matching.
 For example, `john` will match `John Doe` and `john doe`. You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME should appear at least once.
+:exclamation: **Caution:** STUDENT_NAME should appear exactly once.
 
 :exclamation: **Caution:** LESSON_TITLE, START_TIME, and END_TIME should all appear exactly once.
 
@@ -581,18 +598,16 @@ For example, `john` will match `John Doe` and `john doe`. You can refer to the [
 
 #### Add an Exam to be tracked
 
-Create an Exam within TutorPro to be tracked for a given student.
+Create an Exam for a given student(s).
 
 Format: `new-exam [name/STUDENT_NAME].. [exam/EXAM_NAME] [start/START_TIME] 
-[end/END_TIME] (optional)[weightage/WEIGHTAGE] (optional)[grade/GRADE]`
+[end/END_TIME] [weightage/WEIGHTAGE] [grade/GRADE]`
 
-* Creates an exam that is attributed to one or more students.
-* At least one student name must be provided.
-* `START_TIME` and `END_TIME` provided must be in any of the supported date-time formats (see appendix).
-* the format of `GRADE` should be `grade/ACTUAL_SCORE/TOTAL_SCORE`
-* There can be multiple `STUDENT_NAME`s provided to this command, and each name provided will attempt to match with only
-  one student. eg. `new-exam name/John name/Faye...` will attempt to match each name to a student being tracked,
-  and will result in two exams with the same parameters being attributed to students 'John' and 'Faye'.
+* One or more `STUDENT_NAME` prefixes must be provided. Multiple `STUDENT_NAME` will assign the exam to multiple students.
+* `GRADE` and `WEIGHTAGE` are optional.
+* The format of `GRADE` should be `grade/ACTUAL_SCORE/TOTAL_SCORE`
+* `GRADE` can only be saved if the exam is in the past.
+* `WEIGHTAGE` should be entered as a percentage out of 100 (without the % symbol).
 
 Examples:
 * `new-exam name/John Doe exam/Math MYE start/2023-05-21 12:00 end/2023-05-21 14:00`
@@ -604,17 +619,19 @@ Examples:
 For example, `john` will match `John Doe` and `john doe`.
 You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME should appear at least once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME should appear at least once.
 
-:exclamation: **Caution:** EXAM_NAME, START_TIME, and END_TIME should appear exactly once and should not be empty.
+:exclamation: **Caution:** EXAM_NAME, START_TIME, and END_TIME should appear exactly once.
 
 #### Remove an exam
 
-Format: `delete-exam [name/STUDENT_NAME].. [index/INDEX_OF_EXAM]`
+Deletes an exam of a student.
+
+Format: `delete-exam [name/STUDENT_NAME].. [index/EXAM_INDEX]`
 
 * Removes an exam that TutorPro is currently tracking.
 * At least one student name must be provided.
-* `INDEX_OF_EXAM` is in reference to the indexing of the exams listed when invoking the `view-exam` command on a 
+* `EXAM_INDEX` is in reference to the indexing of the exams listed when invoking the `view-exam` command on a 
 student.
 * There can be multiple `STUDENT_NAME`s provided to this command, and each name provided will attempt to match with only
   one student. eg. `delete-exam name/John name/Faye index/1` will attempt to match each name to a student being tracked,
@@ -632,18 +649,18 @@ being run one after another.
 For example, `john` will match `John Doe` and `john doe`.
 You can refer to the [search by name mechanism](#search-by-name-mechanism) for more details.
 
-:exclamation: **Caution:** STUDENT_NAME should appear at least once and should not be empty.
+:exclamation: **Caution:** STUDENT_NAME should appear at least once.
 
 #### View exams tracked by TutorPro
 
-Format: `view-exam (optional)[name/STUDENT_NAME].. (optional)[date/DATE] (optional)[exam/NAME_OF_EXAM] (optional)
-[done/IS_DONE]`
+Displays exams stored in TutorPro, with the option to filter based on Exam date, Student name or past/upcoming status.
+
+Format: `view-exam [name/STUDENT_NAME].. [date/DATE] [exam/NAME_OF_EXAM] [done/IS_DONE]`
 
 * Lists exams TutorPro is currently tracking, while filtering for the specified predicates
 * All predicates are optional, leaving all parameters blank will list all currently tracked exams
-* Field `[IS_DONE]` when filled with parameter 'done' `eg. done/done` will list all completed exams. Leave this field 
-blank `eg. done/` when filtering for upcoming exams -> CHANGED BY BOQIAN
-* There can be multiple `STUDENT_NAME`s provided to this command, and each name provided will attempt to match with only
+* Field `IS_DONE` can be used with values `done` to show completed exams, or `not done` to show upcoming exams. 
+* There can be multiple `STUDENT_NAME` prefixes provided to this command, and each name provided will attempt to match with only
  one student. eg. `view-exam name/John name/Faye` will attempt to match each name to a student being tracked, and will
 result in exams of students 'John' and 'Faye' being listed.
 
@@ -665,13 +682,16 @@ You can refer to the [search by name mechanism](#search-by-name-mechanism) for m
 
 #### Edit exam details
 
-Format: `update-exam [name/STUDENT_NAME] [index/INDEX] (optional)[exam/NEW_EXAM_NAME] (optional)[start/START_TIME] 
-(optional)[end/END_TIME] (optional)[grade/GRADE]`
+Updates an exam's information.
 
-* Updates the details of an exam tracked by TutorPro
-* Of the optional fields, one must be provided in order to update the exam.
-* `START_TIME` and `END_TIME` provided must be in any of the supported date-time formats (see appendix).
-* `INDEX` is in reference to the indexing of the exams listed when invoking the `view-exam` command on a
+Format: `update-exam [name/STUDENT_NAME] [index/EXAM_INDEX] [exam/NEW_EXAM_NAME] [start/START_TIME] 
+[end/END_TIME] [weightage/WEIGHTAGE] [grade/GRADE]`
+
+* Updates the details of an exam tracked by TutorPro.
+* `NEW_EXAM_NAME`, `START_TIME`, `END_TIME`, `WEIGHTAGE` and `GRADE` are the the updated values for this exam and are optional.
+* Of the optional fields, at least one must be provided in order to update the exam.
+* `GRADE` can only be updated after the exam has finished.
+* `EXAM_INDEX` is in reference to the indexing of the exams listed when invoking the `view-exam` command on a
 student.
 
 Examples:
@@ -686,12 +706,50 @@ You can refer to the [search by name mechanism](#search-by-name-mechanism) for m
 
 :exclamation: **Caution:** STUDENT_NAME should appear exactly once and should not be empty.
 
+
+### Global Commands
+
+#### Get Help for TutorPro
+
+Shows the link for TutorPro support and documentation.
+
+Format: `help`
+
+* Opens the help window where you can copy the link to TutorPro's support site.
+
+Example
+* `help` Opens the help window.
+
+#### Clear All TutorPro Data
+
+Deletes all information stored in TutorPro.
+
+Format: `clear`
+
+Example:
+* `clear` Deletes all student, homework, lesson and exam data in TutorPro.
+
+:exclamation: **Caution:** Clear is an irreversible command. Any data you lose cannot be recovered anymore. Please use with caution.
+
+
+#### Exit TutorPro
+
+Closes TutorPro.
+
+Format: `exit`
+
+* This command is just a quick shortcut for keyboard-savvy users. Closing TutorPro with the (X) icon also safely quits TutorPro, without losing any data.
+
+Example:
+* `exit` Safely closes TutorPro.
+
+
 ## Unique Mechanisms
 
 ### Search by Name Mechanism
 
-* TutorPro uses Students' Names as primary keys to identify students.
-* Most of the commands (except) in TutorPro allow you to search for a student by name, rather than by index, which is more intuitive for the user and eliminates the need to remember the index of the student.
+* TutorPro uses students' Names as primary keys to identify students.
+* Most commands in TutorPro allow you to search for a student by name, rather than by index, which is more intuitive for the user and eliminates the need to remember the index of the student.
 * Therefore, duplicate names aren't allowed. Names that are substrings of other names or vice versa aren't allowed. For example, `John Doe` and `John` are not allowed. If you have students with the exact name, say `John Doe`, you can add a number to the end of the name to differentiate them. For example, `John Doe 1` and `John Doe 2`.
 * The search by name mechanism is case-insensitive, meaning that the search will be case-insensitive. For Example, `john doe` and `John Doe` will be treated as the same name.
 * Partial names can be used as well. For example, `doe` will return all students with the name `John Doe` and `Jane Doe`.
@@ -704,18 +762,18 @@ You can refer to the [search by name mechanism](#search-by-name-mechanism) for m
 * TutorPro will detect if there is a clash between the new lesson and existing lessons of all students. 
 * Since TutorPro is meant for one tutor, it is assumed that the tutor will not be teaching two lessons at the same time.
 * When adding a new lesson, TutorPro will check if the lesson clashes with any other lessons of all students. For example: 
-  * Run command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`.
+  * Running command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`.
   * If you then run command `new-lesson name/John Doe lesson/Science Lesson start/2023-05-21 13:00 end/2023-05-21 15:00`, which adds a new lesson for `John Doe` on `2023-05-21` from `13:00` to `15:00`, TutorPro will detect that there is a clash in the schedule and will not add the lesson for `John Doe` as a student can't have two lessons at the same time.
 * We also Assume that tutors will only teach one student at a time. Therefore, if multiple students have lessons even with the same at the same time, TutorPro will detect that there is a clash in the schedule and will not add the lesson for the student. For example:
-  * Run command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`. 
+  * Running command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`. 
   * If you then run command `new-lesson name/Irfan Ibrahim lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00`, which adds a new lesson for `Irfan Ibrahim` on `2023-05-21` from `12:00` to `14:00`, TutorPro will detect that there is a clash in the schedule and will not add the lesson for `Irfan Ibrahim` as a tutor can't teach two students at the same time.
 
 ##### With respect to existing exams
 * TutorPro will detect if there is a clash between the new lesson and existing exams of the particular student.
 * Since the timing of the exam is determined by the school of the student, TutorPro will prioritize the timing of the exam over the new lesson.
 * We assume that a student will not have an exam and a lesson at the same time. For example:
-  * Run command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`.
-  * If you then run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 13:00 end/2023-05-21 15:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `15:00`, TutorPro will detect that there is a clash in the schedule and will not add the lesson for `John Doe` as a student can't have an exam and a lesson at the same time.
+  * Run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 13:00 end/2023-05-21 15:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `15:00`, 
+  * If you then run command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00`, which will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`, TutorPro will detect that there is a clash in the schedule and will not add the lesson for `John Doe`, as a student can't have an exam and a lesson at the same time.
 
 #### Schedule Clash Detection Mechanism when Adding a New Exam
 
@@ -723,37 +781,37 @@ You can refer to the [search by name mechanism](#search-by-name-mechanism) for m
 * TutorPro will detect if there is a clash between the new exam and existing lessons of the particular student.
 * Since the timing of the exam is determined by the school of the student, TutorPro will prioritize the timing of the new exam over the existing lessons.
 * We assume that a student will not have an exam and a lesson at the same time. For example:
-  * Run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new exam for `John Doe` on `2023-05-21` from `12:00` to `14:00`.
+  * Run command `new-lesson name/John Doe lesson/Math Lesson start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new lesson for `John Doe` on `2023-05-21` from `12:00` to `14:00`.
   * If you then run command `new-exam name/John Doe exam/Science Exam start/2023-05-21 13:00 end/2023-05-21 15:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `15:00`, unlike the previous section, TutorPro will allow you to add the exam for `John Doe` as the exam timing is more important than the lesson timing.
-  * However, TutorPro will detect that there is a clash in the schedule will prompt you to update the clashed lesson's timing.
+  * However, TutorPro will detect that the clash in the schedule and will prompt you to update the clashed lesson's timing.
 
 ##### With respect to existing exams
-* TutorPro will detect if there is a clash in the schedule of a students when adding a new exam.
+* TutorPro will detect if there is a clash in the schedule of a student when adding a new exam.
 * We assume that a student will not have two exams at the same time.
 * Unlike adding a new lesson, when adding a new exam, TutorPro will check if the exam clashes with any other exams of the same student only. (note the difference between adding a new lesson and adding a new exam). For example:
   * Run command `new-exam name/John Doe exam/English Exam start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new exam for `John Doe` on `2023-05-21` from `12:00` to `14:00`. 
-  * If you run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 12:00 end/2023-05-21 14:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `14:00`, TutorPro will detect that there is a clash in the schedule and will not add the exam for `John Doe` as a student can't have two exams at the same time.
+  * If you run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 13:00 end/2023-05-21 14:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `14:00`, TutorPro will detect that there is a clash in the schedule and will not add the exam for `John Doe` as a student can't have two exams at the same time.
 
-### Duplicate Detection Mechanism
+### Duplicate Detection Policy
 TutorPro will detect duplicate homeworks,
 lessons and exams and will not add them to the student's list of homeworks, lessons and exams respectively.
 However,
 you may have noticed that duplicate homework name is not allowed but duplicate lesson name and exam name is allowed.
 This is a carefully crafted feature that will be explained in the following section.
 
-#### Duplicate Homework Detection Mechanism
+#### Duplicate Homework Detection
 * TutorPro identifies homework by its name, since we assume that a student can have multiple homeworks with the same deadline.
 * Since name is the primary key for homework, duplicate homework names are not allowed. For example, if you have a homework named `Math Homework` and you try to add another homework with the same name even with a different deadline, TutorPro will detect that there is a duplicate homework and will not add the homework.
 * If you homework with the same name, we encourage you to add a number to the end of the name to differentiate them. For example, `Math Homework 1` and `Math Homework 2`.
 
-#### Duplicate Lesson Detection Mechanism
+#### Duplicate Lesson Detection
 * TutorPro identifies a lesson by its start time and end time, since we assume that a student can have multiple lessons with the same name, but they can't have two lessons at the same time.
 * Since start time and end time is the primary key for lessons, lessons that `clash` with other lessons aren't allowed. (See [Schedule Clash Detection Mechanism when Adding a New Lesson](#schedule-clash-detection-mechanism-when-adding-a-new-lesson) for more details)
 * However, adding lessons with the duplicate name but without `clashes` with other lessons are allowed. For example:
   * if you have a lesson named `Math Lesson` for `John Doe` on `2023-05-21` from `12:00` to `14:00` 
   * you then try to add another lesson with the same name but on `2023-05-24` from `13:00` to `15:00`, TutorPro will not detect that there is a duplicate lesson and will add the lesson.
 
-#### Duplicate Exam Detection Mechanism
+#### Duplicate Exam Detection
 * TutorPro identifies an exam by its start time and end time, since we assume that a student can have multiple exams with the same name, but they can't have two exams at the same time.
 * Since start time and end time is the primary key for exams, exams that `clash` with other exams aren't allowed. (See [Schedule Clash Detection Mechanism when Adding a New Exam](#schedule-clash-detection-mechanism-when-adding-a-new-exam) for more details)
 * However, adding exams with the duplicate name but without `clashes` with other exams are allowed. For example:
@@ -781,22 +839,26 @@ Alternatively, you can also view with the profile button on the student card.
 
 ### List of Commands
 
-| Action                       | Command Format                                                                                                                                                       | Example                                                                                                                |
-|:-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| Create new student profile   | `new-student [name/STUDENT_NAME] [address/STUDENT_ADDRESS] [phone/PHONE] [email/EMAIL] [school/SCHOOL] [level/GRADE_LEVEL]`                                          | `new-student name/John Doe address/21 Prince George’s Park email/jdoe@gmail.com phone/12345678 school/ACJC level/sec8` |
-| Update student information   | `update-info [index/INDEX] [name/STUDENT_NAME] [f/FIELD] [v/VALUE]`                                                                                                  | `update-info index/1 name/John f/address v/Block 123 #12-34`                                                           |
-| Assign homework to a student | `new-homework [name/STUDENT_NAME] [homework/HOMEWORK_NAME] [deadline/DEADLINE]`                                                                                      | `assign-homework name/John homework/listening comprehension ex1 deadline/02-12-2023-2359`                              |
-| View student's homework      | `view-homework [name/STUDENT_NAME] [status/STATUS]`                                                                                                                  | `view-homework name/John status/pending`                                                                               |
-| Delete student's homework    | `delete-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                                                         | `delete-homework name/John index/1`                                                                                    |
-| Mark homework as done        | `mark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                                                           | `mark-homework name/John index/1`                                                                                      |
-| Unmark homework as undone    | `unmark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                                                         | `unmark-homework name/John index/1`                                                                                    |
-| Update student's homework    | `update-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX] [homework/HOMEWORK_NAME] [deadline/DEADLINE]`                                                            | `update-homework name/John index/1 homework/Math Assignment 1`                                                         |
-| Create new lesson plan       | `new-lesson [name/STUDENT_NAME] [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`                                                                             | `new-lesson name/John Doe lesson/The Water Cycle start/25-03-23-1300 end/25-03-23-1500`                                |
-| View lessons history         | `view-lesson [name/STUDENT_NAME]`                                                                                                                                    | `view-lesson name/John`                                                                                                |
-| Add an exam                  | `new-exam [name/STUDENT_NAME_1] [name/STUDENT_NAME_2].. [exam/EXAM_NAME] [start/START_TIME] [end/END_TIME] (optional)[weightage/WEIGHTAGE] (optional)[grade/GRADE]`  | `new-exam name/John Doe exam/Math MYE start/2023-05-21 12:00 end/2023-05-21 14:00`                                     |
-| Remove an exam               | `delete-exam [name/STUDENT_NAME_1] [name/STUDENT_NAME_2].. [index/INDEX_OF_EXAM]`                                                                                    | `delete-exam name/John Doe index/1`                                                                                    |
-| Update an exam               | `update-exam [name/STUDENT_NAME] [index/INDEX_OF_EXAM] (optional)[exam/NEW_EXAM_NAME] (optional)[start/START_TIME] (optional)[end/END_TIME] (optional)[grade/GRADE]` | `update-exam name/John Doe index/1 exam/Math MYE`                                                                      |
-| View exams                   | `view-exam [name/STUDENT_NAME] (optional)[date/DATE] (optional)[exam/EXAM_NAME] (optional)[done/DONE_STATUS]`                                                        | `view-exam name/John Doe date/2023-05-01 exam/MYE done/`                                                               |
+| Action                       | Command Format                                                                                                               | Example                                                                                                                |
+|:-----------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| Create new student profile   | `new-student [name/STUDENT_NAME] [address/STUDENT_ADDRESS] [phone/PHONE] [email/EMAIL] [school/SCHOOL] [level/GRADE_LEVEL]`  | `new-student name/John Doe address/21 Prince George’s Park email/jdoe@gmail.com phone/12345678 school/ACJC level/sec8` |
+| Update student information   | `update-info [index/INDEX] [name/STUDENT_NAME] [field/NEW_INFO]...`                                                          | `update-info index/1 name/John address/Block 123 #12-34`                                                               |
+| Delete student profile       | `delete [index/STUDENT_INDEX]`                                                                                               | `delete index/1`                                                                                                       |
+| View Profile                 | `view-profile [name/STUDENTS_NAME]`                                                                                          | `view-profile name/John`                                                                                               |
+| Assign homework to a student | `new-homework [name/STUDENT_NAME]... [homework/HOMEWORK_NAME] [deadline/DEADLINE]`                                           | `new-homework name/John homework/listening comprehension ex1 deadline/02-12-2023 23:59`                                |
+| View student's homework      | `view-homework [name/STUDENT_NAME]... [status/STATUS]`                                                                       | `view-homework name/John status/pending`                                                                               |
+| Delete student's homework    | `delete-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                 | `delete-homework name/John index/1`                                                                                    |
+| Mark homework as done        | `mark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                   | `mark-homework name/John index/1`                                                                                      |
+| Unmark homework as undone    | `unmark-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX]`                                                                 | `unmark-homework name/John index/1`                                                                                    |
+| Update student's homework    | `update-homework [name/STUDENT_NAME] [index/HOMEWORK_INDEX] [homework/HOMEWORK_NAME] [deadline/DEADLINE]`                    | `update-homework name/John index/1 homework/Math Assignment 1`                                                         |
+| Create new lesson plan       | `new-lesson [name/STUDENT_NAME] [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`                                     | `new-lesson name/John Doe lesson/The Water Cycle start/25-03-23-1300 end/25-03-23-1500`                                |
+| View lessons history         | `view-lesson [name/STUDENT_NAME] [subject/SUBJECT] [date/DATE] [done/DONE]`                                                  | `view-lesson name/John`                                                                                                |
+| Delete a lesson              | `delete-lesson [name/STUDENT_NAME] [index/LESSON_INDEX]`                                                                     | `delete-lesson name/John Doe index/1`                                                                                  |
+| Update a lesson              | `update-lesson [name/STUDENT_NAME] [index/LESSON_INDEX] [lesson/LESSON_TITLE] [start/START_TIME] [end/END_TIME]`             | `update-lesson name/John Doe index/1 lesson/The Water Cycle start/2025-03-23 1300 end/2025-03-23 1500`                 |
+| Add an exam                  | `new-exam [name/STUDENT_NAME]... [exam/EXAM_NAME] [start/START_TIME] [end/END_TIME] [weightage/WEIGHTAGE] [grade/GRADE]`     | `new-exam name/John Doe exam/Math MYE start/2023-05-21 12:00 end/2023-05-21 14:00`                                     |
+| Remove an exam               | `delete-exam [name/STUDENT_NAME]... [index/INDEX_OF_EXAM]`                                                                   | `delete-exam name/John Doe index/1`                                                                                    |
+| Update an exam               | `update-exam [name/STUDENT_NAME] [index/INDEX_OF_EXAM] [exam/NEW_EXAM_NAME] [start/START_TIME] [end/END_TIME] [grade/GRADE]` | `update-exam name/John Doe index/1 exam/Math MYE`                                                                      |
+| View exams                   | `view-exam [name/STUDENT_NAME]... [date/DATE] [exam/EXAM_NAME] [done/DONE_STATUS]`                                           | `view-exam name/John Doe date/2023-05-01 exam/MYE done/`                                                               |
 
 ### List of Prefixes
 
