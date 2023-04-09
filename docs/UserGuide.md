@@ -302,17 +302,18 @@ Create a homework assignment with a deadline for multiple students.
 Format: `new-homework [name/STUDENT_NAME]... [homework/HOMEWORK_NAME] [deadline/DEADLINE]`
 
 * The `STUDENT_NAME` must be an existing student of the tutor.
+* You can enter multiple `name/` prefixes to assign the same homework to multiple students. 
 * The `DEADLINE` must be in the format given in the support date and time formats' appendix.
 * The `DEADLINE` must be in the future.
 
 Examples:
-* `new-homework name/John homework/listening comprehension ex1 deadline/2023-05-30 2359` adds the assignment `listening comprehension ex1` to the student named `John. The deadline is 02 Dec 2023 at 23:25.
+* `new-homework name/John homework/listening comprehension ex1 deadline/2023-05-30 2359` adds the assignment `listening comprehension ex1` to the student named `John. The deadline is 30 May 2023 at 23:59.
 * `new-homework name/Donald homework/english essay deadline/2023-05-14 2359` adds the assignment `English Essay` to the student named `Donald`. The deadline is 14 May 2023 at 23:59.
-* `new-homework name/Kai Ze name/Muhammad homework/math ex1 deadline/2023-05-23 2359` adds the assignment `math ex1` to the student named `Kai Ze` and `Muhammad`. The deadline is 23 May 2023 at 23:59.
+* `new-homework name/Kai Ze name/Muhammad homework/math ex1 deadline/2023-05-23 2359` adds the assignment `math ex1` to the students named `Kai Ze` and `Muhammad`. The deadline is 23 May 2023 at 23:59.
 
 ![New Homework](images/new-homework.jpg)
 
-:bulb: **Tip:** You can use the `view-homework` command to view the list of homework the student currently has.
+:bulb: **Tip:** You can use the `view-homework` command or click on the `Homework` button next to their name to view the list of homework the student currently has.
 
 :bulb: **Tip:** You can view the supported date and time formats [here](#supported-date-time-formats).
 
@@ -324,17 +325,17 @@ For example, `john` will match `John Doe` and `john doe`. You can refer to the [
 :exclamation: **Caution:** HOMEWORK_INDEX
 and DEADLINE should all only appear exactly once and should not be empty.
 
-:exclamation: **Caution:** A student can have multiple homework with the same name,
+:bulb: **Tip:** A student can have multiple homeworks with the same name,
 even if they have different deadlines.
 
-#### View the Homework of Students
+#### View Student Homework
 
 Displays a list of homework with the ability to filter by student name and homework status.
 
 Format: `view-homework [name/STUDENT_NAME]... [status/STATUS]`
 
 * By default, all homework will be displayed if no name or status parameter is provided.
-* To view homework for specific students, specify the name using `name/STUDENT_NAME`s.
+* To view homework for specific students, specify the name using `name/STUDENT_NAME` prefixes.
 * To view homework with a specific status, specify the status using `status/STATUS`.
 * It is possible to filter by both student name and status simultaneously.
 * The available status values are `completed` and `pending`.
