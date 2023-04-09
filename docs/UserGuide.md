@@ -113,14 +113,13 @@ When you first run the app, you may see a display window pop up similar to the o
 
 ![Starting Display Window](images/GUI.jpg)
 
-* The **Command Box** on the left bottom refers to the text field where you can type in all your commands.
-* The **Display List for Students** on the left top refers to the section where all the students are displayed.
+* The **Command Box** on the bottom left refers to the text field where you can type in all your commands.
+* The **Display List for Students** on the top left refers to the section where all the students are displayed.
 * The **Detailed Information Section** on the right refers to the section where more specific information of the profile, homework, lessons, or exams of a particular student is displayed.
 
 You may enter the following commands in the Command Box to see how the Display List changes:
 * `list` lists all students.
 * `delete 1` deletes the student with index 1.
-* `view-homework` displays all the homework from all students.
 
 You may also click the quick access buttons one each student card to see how the Detailed Information Section changes.
       
@@ -143,7 +142,7 @@ Upon clicking the Profile Button, the Detailed Information section will be refre
 
 It includes a homework list, showing all the homework information.
 The icon on the left of each homework represents its status,
-with the tick icon being `completed` and the cross-icon being `pending`.
+with the tick icon being `done` and the cross-icon being `not done`.
 It also has a pie chart which represents a ratio between completed and pending homework.
 
 ![Starting Display Window](images/Homework.jpg)
@@ -183,7 +182,7 @@ you can use the `view-exams` command to view the list of exams.
 ## Main Entities
 TutorPro allows you to easily handle three main entities of your students: `Homework`, `Lesson`, and `Exam`.
 TutorPro also has unique mechanisms to handle duplicate entities and potential clashes between entities.
-Please refer to the [#Duplicate Detection Mechanism](#duplicate-detection-mechanism) and [#Schedule Clash Detection Mechanism](#schedule-clash-detection-mechanism) sections for more details.
+Please refer to the [Duplicate Detection Mechanism](#duplicate-detection-mechanism) and [Schedule Clash Detection Mechanism](#schedule-clash-detection-mechanism) sections for more details.
 
 ### Homework
 A `Homework` is an assignment that you've assigned to a `Student`.
@@ -204,15 +203,13 @@ It has a name, a start time, an end time, and a status, an optional weightage, a
 
 ### How to interpret the Command format
 
-* The terms in `UPPER_CASE` are placeholders need to replace with your n values. For example, in the command `new-student name/NAME`, `NAME` is a placeholder that can be substituted with a specific name, such as `new-student n/John Doe`.
-* Items with `…`​ after them can be used multiple times including zero times.<br>
-  e.g. `[name/STUDENT_NAME]…​` can be used as ` ` (i.e. 0 times), `name/John Doe`, `name/John Doe name/Jane Doe` etc.
-* Extraneous parameters for commands that don't take in parameters
-  (such as `help`, `exit,` and `clear`) will be ignored.<br>
+* The terms in `UPPER_CASE` are placeholders need to be replaced with your values. For example, in the command `new-student name/NAME`, `NAME` is a placeholder that can be substituted with a specific name, such as `new-student name/John Doe`.
+* Items with `…`​ after them can be used zero or more times.<br>
+  e.g. `[name/STUDENT_NAME]…​` can be used as ` ` (i.e. 0 times), `name/John Doe`, `name/John Doe name/Jane Doe` (2 times) etc.
+* Extra parameters for commands that don't take in parameters (such as `help`, `exit,` and `clear`) will be ignored.<br>
   e.g. if the command specifies `help 123`, it will be interpreted as `help`.
 * Unless otherwise specified, the order of prefixes doesn't matter.<br>
   e.g. if the command specifies `name/NAME phone/PHONE_NUMBER`, `phone/PHONE_NUMBER name/NAME` is also acceptable unless stated otherwise in a particular command.
-* Parameters can be in any order.
 * TutorPro allows you to execute commands on students in the entire student list, instead of just the displayed list. 
   For example: 
   - currently, the displaying list only shows one student, `Bernice Yu`.
