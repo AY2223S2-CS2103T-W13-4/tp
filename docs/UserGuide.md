@@ -58,7 +58,7 @@ TutorPro is a **desktop app designed to help private tutors manage their student
     + [Schedule Clash Detection Mechanism when Adding a New Exam](#schedule-clash-detection-mechanism-when-adding-a-new-exam)
       - [With respect to existing lessons](#with-respect-to-existing-lessons-1)
       - [With respect to existing exams](#with-respect-to-existing-exams-1)
-  * [Duplicate Detection Policy](#duplicate-detection-policy)
+  * [Duplicate Detection Mechanism](#duplicate-detection-mechanism)
     + [Duplicate Homework Detection](#duplicate-homework-detection)
     + [Duplicate Lesson Detection](#duplicate-lesson-detection)
     + [Duplicate Exam Detection](#duplicate-exam-detection)
@@ -792,7 +792,7 @@ Example:
   * Run command `new-exam name/John Doe exam/English Exam start/2023-05-21 12:00 end/2023-05-21 14:00` will add a new exam for `John Doe` on `2023-05-21` from `12:00` to `14:00`. 
   * If you run command `new-exam name/John Doe exam/Math Exam start/2023-05-21 13:00 end/2023-05-21 14:00`, which adds a new exam for `John Doe` on `2023-05-21` from `13:00` to `14:00`, TutorPro will detect that there is a clash in the schedule and will not add the exam for `John Doe` as a student can't have two exams at the same time.
 
-### Duplicate Detection Policy
+### Duplicate Detection Mechanism
 TutorPro will detect duplicate homeworks,
 lessons and exams and will not add them to the student's list of homeworks, lessons and exams respectively.
 However,
